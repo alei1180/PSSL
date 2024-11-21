@@ -1,24 +1,22 @@
-﻿// MIT License
-
-// Copyright (c) 2024 Anton Tsitavets
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+﻿// Библиотека проектных подсистем для упрощения разработки архитектуры на 1С: Предприятие 8,
+// включая доработку типовых конфигураций.
+//
+// Copyright First BIT company
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//
+// URL:    https://github.com/firstBitSportivnaya/PSSL/
+//
 
 #Область ПрограммныйИнтерфейс
 
@@ -27,23 +25,18 @@
 // Параметры:
 //  АдресВХранилище	 - Строка - Адрес файла во временном хранилище
 //  Расширение		 - Строка - Расширение файла (xls, xlsx)
-//  Параметры		 - Структура - структура параметров загрузки Excel-файла
-//  см. пбп_ЗагрузкаФайлаЧерезТабличныйДокументКлиент.ИнициализироватьСтруктуруПередачиПараметровНаСервер
+//  ПараметрыЧтения	 - Структура - структура параметров загрузки Excel-файла
+//  см. пбп_ЗагрузкаФайлаЧерезТабличныйДокументСервер.ПолучитьПараметрыЧтенияФайла
 //
-Процедура ФормированиеТаблицы(АдресВХранилище, Расширение, Параметры) Экспорт
+Процедура ФормированиеТаблицы(АдресВХранилище, Расширение, ПараметрыЧтения) Экспорт
 	
-	ТаблицаСвойств = ПолучитьИзВременногоХранилища(Параметры.АдресМакета);
-	
-	ПараметрыЧтения = пбп_ЗагрузкаФайлаЧерезТабличныйДокументСервер.ПолучитьПараметрыЧтенияФайла();
-	ПараметрыЧтения.НазваниеЛиста = Параметры.НазваниеЛиста;
-	ПараметрыЧтения.НомерСтроки = Параметры.НомерПервойСтроки;
-	ПараметрыЧтения.СопоставлениеПоНаименованию = Параметры.ПоНаименованию;
+	ТаблицаСвойств = ПолучитьИзВременногоХранилища(ПараметрыЧтения.АдресМакета);
 	
 	ТаблицаДанных = пбп_ЗагрузкаФайлаЧерезТабличныйДокументСервер
 		.КонвертироватьДанныеТабличногоДокументаВТаблицуЗначений(
 		АдресВХранилище, Расширение, ТаблицаСвойств, ПараметрыЧтения);
 	
-	ПоместитьВоВременноеХранилище(ТаблицаДанных, Параметры.АдресПомещения);
+	ПоместитьВоВременноеХранилище(ТаблицаДанных, ПараметрыЧтения.АдресПомещения);
 	
 КонецПроцедуры
 
@@ -78,19 +71,18 @@
 //
 Функция ИнициализироватьТаблицуСоСвойствамиКолонок() Экспорт
 	
-	СвойстваКолонок = Новый ТаблицаЗначений;
-	ДлинаСтроки = 150;
-	СвойстваКолонок.Колонки.Добавить("ИмяКолонки"		, пбп_ОбщегоНазначенияСервер.ОписаниеТипаСтрока(ДлинаСтроки));
-	СвойстваКолонок.Колонки.Добавить("ИмяВТабДоке"		, пбп_ОбщегоНазначенияСервер.ОписаниеТипаСтрока(ДлинаСтроки));
-	СвойстваКолонок.Колонки.Добавить("ТипЗначения"		, пбп_ОбщегоНазначенияСервер.ОписаниеТипаСтрока(ДлинаСтроки));
-	СвойстваКолонок.Колонки.Добавить("ПолеПоиска1"		, пбп_ОбщегоНазначенияСервер.ОписаниеТипаСтрока(ДлинаСтроки));
-	СвойстваКолонок.Колонки.Добавить("ПолеПоиска2"		, пбп_ОбщегоНазначенияСервер.ОписаниеТипаСтрока(ДлинаСтроки));
-	СвойстваКолонок.Колонки.Добавить("ПолеПоиска3"		, пбп_ОбщегоНазначенияСервер.ОписаниеТипаСтрока(ДлинаСтроки));
-	// BSLLS:MagicNumber-off
-	СвойстваКолонок.Колонки.Добавить("ОператорСравнения"	, пбп_ОбщегоНазначенияСервер.ОписаниеТипаСтрока(3));
-	// BSLLS:MagicNumber-on
+	Возврат пбп_ЗагрузкаФайлаЧерезТабличныйДокументСервер.ИнициализироватьТаблицуСоСвойствамиКолонок();
 	
-	Возврат СвойстваКолонок;
+КонецФункции
+
+// Получить параметры чтения файла
+// 
+// Возвращаемое значение:
+//  Структура - см. пбп_ЗагрузкаФайлаЧерезТабличныйДокументСервер.ПолучитьПараметрыЧтенияФайла
+//
+Функция ПолучитьПараметрыЧтенияФайла() Экспорт
+	
+	Возврат пбп_ЗагрузкаФайлаЧерезТабличныйДокументСервер.ПолучитьПараметрыЧтенияФайла();
 	
 КонецФункции
 
